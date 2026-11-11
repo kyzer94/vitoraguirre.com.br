@@ -1,116 +1,120 @@
-import { Laptop, CreditCard, Cpu, Wrench, ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
-const services = [
+const capabilities = [
   {
-    icon: Laptop,
-    title: "Aplicações Web & SaaS Sob Medida",
+    num: "01",
+    title: "Desenvolvimento Web & Plataformas SaaS",
     description:
-      "Desenvolvimento de plataformas completas do zero ou modernização de sistemas legados. Painéis administrativos densos, sistemas de e-commerce e portais corporativos rápidos e seguros.",
-    features: [
-      "Frontend reativo com Next.js (App Router) e Tailwind CSS",
-      "Backend escalável com Laravel ou Node.js",
-      "Arquitetura de APIs RESTful modulares e documentadas",
+      "Construção de aplicações completas de ponta a ponta. Painéis administrativos densos, sistemas de e-commerce e portais corporativos com foco em estabilidade, segurança e velocidade.",
+    deliverables: [
+      "Frontend em Next.js (App Router, Server Actions) & Tailwind CSS",
+      "Backend modular em Laravel 11 ou Node.js (REST APIs)",
       "Modelagem e otimização de banco de dados MySQL",
+      "Arquitetura pronta para alta concorrência de usuários",
     ],
   },
   {
-    icon: CreditCard,
+    num: "02",
     title: "Integrações Financeiras & Gateways de Pagamento",
     description:
-      "Transformação de produtos em máquinas de vendas online com suporte a pagamentos transparentes, cobranças recorrentes e split para parceiros.",
-    features: [
+      "Transformação de modelos de negócio em fluxos automatizados de receita. Implementação de checkouts transparentes, modelos de assinatura com trial e liquidação automática.",
+    deliverables: [
       "Stripe Checkout e Elements",
-      "Asaas (Pix dinâmico instantâneo e Cartão até 12x)",
-      "Mercado Pago, PayPal e PagSeguro",
-      "Tratamento idempotente de Webhooks para conciliação segura",
+      "Asaas: Pix dinâmico instantâneo e Cartão até 12x",
+      "Mercado Pago e PayPal",
+      "Tratamento resiliente de Webhooks com idempotência e conciliação",
     ],
   },
   {
-    icon: Cpu,
-    title: "Automação Comercial, RPA & Bots de WhatsApp",
+    num: "03",
+    title: "Automação Comercial, RPA & Bots de Mensageria",
     description:
-      "Eliminação de trabalho manual e criação de canais de venda automatizados através de robôs de mensageria e esteiras de coleta de dados.",
-    features: [
+      "Substituição de processos operacionais repetitivos por automações programadas e criação de canais de venda direta em tempo real.",
+    deliverables: [
       "Bots de WhatsApp em Node.js com regras de lances/vendas 24/7",
       "Tolerância a missclick e confirmação de pedidos em tempo real",
-      "Web Scraping e monitoramento de concorrentes com Python (Selenium/Pandas)",
-      "Integrações de funil de vendas com Zoho CRM e Google Sheets",
+      "Web Scraping e coleta de dados concorrentes com Python (Selenium/Pandas)",
+      "Sincronização periódica entre APIs externas, CRMs e bancos de dados",
     ],
   },
   {
-    icon: Wrench,
-    title: "WebOps, Infraestrutura Linux & Performance",
+    num: "04",
+    title: "WebOps, Infraestrutura Linux & Otimização",
     description:
-      "Garantia de que sua aplicação não sairá do ar em picos de tráfego e que responderá rápido com segurança e proteção de borda.",
-    features: [
-      "Configuração de servidores VPS Linux (Ubuntu) com Nginx",
-      "Roteamento de proxy reverso e eliminação de falhas 404 de assets",
-      "Mitigação de ataques, WAF e DNS no Cloudflare",
-      "Armazenamento de imagens e mídias pesadas via Cloudflare R2 / S3",
+      "Garantia de que seu sistema opere 24/7 com alta disponibilidade, baixo custo de hospedagem e respostas rápidas sob picos de tráfego.",
+    deliverables: [
+      "Configuração e hardening de servidores VPS Linux (Ubuntu)",
+      "Nginx como proxy reverso, Virtual Hosts e SSL automatizado (Certbot)",
+      "Proteção de borda, regras de DNS e WAF via Cloudflare",
+      "Offload de assets pesados para Cloudflare R2 (S3 API) para economia de banda",
     ],
   },
 ];
 
 export default function Services() {
   return (
-    <section id="servicos" className="py-20 md:py-28 bg-[#0b101d] relative border-t border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="solucoes" className="py-20 md:py-28 border-b border-zinc-800/80">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-semibold uppercase tracking-wider">
-            Soluções & Serviços
+        <div className="mb-12 space-y-2">
+          <div className="text-xs font-mono text-blue-400 uppercase tracking-wider">
+            {"// 03. serviços & capacidades"}
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Como Posso Ajudar o Seu Negócio?
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            Como Posso Contribuir com Seu Projeto ou Equipe
           </h2>
-          <p className="text-slate-400 text-base sm:text-lg">
-            Atuação flexível tanto para projetos sob demanda (Freelance / PJ) quanto para contratação em times de engenharia.
+          <p className="text-zinc-400 text-sm max-w-2xl">
+            Atuação técnica orientada a entregas práticas, disponível tanto para contratação como desenvolvedor
+            em equipes de tecnologia quanto para projetos sob demanda (Freelance / PJ).
           </p>
         </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {services.map((srv, idx) => {
-            const Icon = srv.icon;
-            return (
-              <div
-                key={idx}
-                className="p-8 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 transition-all duration-300 flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-200">
-                    <Icon className="w-6 h-6" />
-                  </div>
-
-                  <h3 className="text-xl font-bold text-white mb-3">
-                    {srv.title}
-                  </h3>
-
-                  <p className="text-slate-300 text-sm leading-relaxed mb-6">
-                    {srv.description}
-                  </p>
-
-                  <ul className="space-y-2.5 mb-8">
-                    {srv.features.map((feat, fIdx) => (
-                      <li key={fIdx} className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-300">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
+        {/* Capabilities Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {capabilities.map((cap) => (
+            <div
+              key={cap.num}
+              className="p-6 sm:p-7 rounded-lg bg-zinc-950 border border-zinc-800/90 hover:border-zinc-700 transition-all flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-900 text-xs font-mono">
+                  <span className="text-zinc-500 font-semibold">{cap.num}.</span>
+                  <span className="text-zinc-500">engenharia_de_software</span>
                 </div>
 
+                <h3 className="text-lg font-bold text-white mb-2">
+                  {cap.title}
+                </h3>
+
+                <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
+                  {cap.description}
+                </p>
+
+                <div className="space-y-2 mb-6">
+                  <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+                    Entregáveis Típicos:
+                  </div>
+                  {cap.deliverables.map((del, dIdx) => (
+                    <div key={dIdx} className="flex items-start gap-2 text-xs text-zinc-300">
+                      <span className="text-blue-400 font-mono">›</span>
+                      <span>{del}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-zinc-900">
                 <a
                   href="#contato"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-zinc-300 hover:text-white transition-colors"
                 >
-                  Solicitar proposta para este serviço
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <span>solicitar proposta para esta demanda</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500" />
                 </a>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
       </div>

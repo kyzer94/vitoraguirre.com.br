@@ -1,118 +1,112 @@
 "use client";
 
 import { useState } from "react";
-import { MessageSquare, Menu, X, ArrowUpRight, Code2 } from "lucide-react";
+import { Menu, X, ArrowUpRight, Copy, Check } from "lucide-react";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyEmail = () => {
+    navigator.clipboard.writeText("vitorlacerda1994@gmail.com");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-[#090d16]/80 border-b border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-[#09090b]/85 border-b border-zinc-800">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
         {/* Brand */}
-        <a href="#" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 p-0.5 shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
-            <div className="w-full h-full bg-[#090d16] rounded-[10px] flex items-center justify-center">
-              <Code2 className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
-            </div>
-          </div>
-          <div>
-            <span className="text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
-              Vitor Aguirre
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                Full Stack
-              </span>
-            </span>
-            <span className="text-xs text-slate-400 block -mt-0.5">vitoraguirre.com.br</span>
-          </div>
+        <a href="#" className="flex items-center gap-2.5 font-mono text-sm tracking-tight text-zinc-100 group">
+          <span className="w-2.5 h-2.5 rounded-sm bg-zinc-100 group-hover:bg-blue-400 transition-colors" />
+          <span className="font-semibold text-zinc-100">vitoraguirre</span>
+          <span className="text-zinc-500 hidden sm:inline">/ full-stack</span>
         </a>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-          <a href="#cases" className="hover:text-blue-400 transition-colors">Cases Reais</a>
-          <a href="#servicos" className="hover:text-blue-400 transition-colors">Serviços & Soluções</a>
-          <a href="#stack" className="hover:text-blue-400 transition-colors">Stack Técnica</a>
-          <a href="#contato" className="hover:text-blue-400 transition-colors">Contato</a>
+        {/* Navigation */}
+        <nav className="hidden md:flex items-center gap-7 text-xs font-mono text-zinc-400">
+          <a href="#sobre" className="hover:text-zinc-100 transition-colors">01. sobre</a>
+          <a href="#cases" className="hover:text-zinc-100 transition-colors">02. engenharia & cases</a>
+          <a href="#solucoes" className="hover:text-zinc-100 transition-colors">03. serviços</a>
+          <a href="#stack" className="hover:text-zinc-100 transition-colors">04. stack</a>
+          <a href="#contato" className="hover:text-zinc-100 transition-colors">05. contato</a>
         </nav>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:flex items-center gap-4">
-          <div className="flex items-center gap-2 text-xs font-medium text-emerald-400 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-            <span>Disponível para projetos</span>
-          </div>
+        {/* Actions */}
+        <div className="hidden sm:flex items-center gap-3">
+          <button
+            onClick={copyEmail}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-xs font-mono text-zinc-300 transition-all"
+            title="Copiar e-mail"
+          >
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-emerald-400">email copiado!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5 text-zinc-500" />
+                <span>copiar e-mail</span>
+              </>
+            )}
+          </button>
 
           <a
-            href="https://wa.me/5551999065232?text=Ol%C3%A1%20Vitor%2C%20vi%20seu%20site%20e%20gostaria%20de%20conversar%20sobre%20um%20projeto%2Foportunidade."
+            href="https://wa.me/5551999065232?text=Ol%C3%A1%20Vitor%2C%20vi%20seu%20site%20e%20gostaria%20de%20conversar."
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold shadow-lg shadow-blue-600/25 transition-all duration-200 hover:scale-[1.02]"
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold font-mono transition-colors"
           >
-            <MessageSquare className="w-4 h-4" />
-            Falar no WhatsApp
-            <ArrowUpRight className="w-3.5 h-3.5 opacity-80" />
+            <span>whatsapp</span>
+            <ArrowUpRight className="w-3.5 h-3.5 opacity-70" />
           </a>
         </div>
 
-        {/* Mobile menu button */}
-        <div className="md:hidden flex items-center">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 focus:outline-none"
-            aria-label="Abrir menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
+        {/* Mobile toggle */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden p-2 text-zinc-400 hover:text-zinc-100"
+          aria-label="Menu"
+        >
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+
       </div>
 
-      {/* Mobile menu dropdown */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#090d16]/95 border-b border-slate-800 px-4 pt-2 pb-6 space-y-4">
-          <a
-            href="#cases"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-medium text-slate-300 hover:text-blue-400"
-          >
-            Cases Reais
+        <div className="md:hidden bg-[#09090b] border-b border-zinc-800 px-6 py-5 space-y-4 font-mono text-xs">
+          <a href="#sobre" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-zinc-400 hover:text-zinc-100">
+            01. sobre
           </a>
-          <a
-            href="#servicos"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-medium text-slate-300 hover:text-blue-400"
-          >
-            Serviços & Soluções
+          <a href="#cases" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-zinc-400 hover:text-zinc-100">
+            02. engenharia & cases
           </a>
-          <a
-            href="#stack"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-medium text-slate-300 hover:text-blue-400"
-          >
-            Stack Técnica
+          <a href="#solucoes" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-zinc-400 hover:text-zinc-100">
+            03. serviços
           </a>
-          <a
-            href="#contato"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-medium text-slate-300 hover:text-blue-400"
-          >
-            Contato
+          <a href="#stack" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-zinc-400 hover:text-zinc-100">
+            04. stack
           </a>
-
-          <div className="pt-2 flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-xs font-medium text-emerald-400 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 w-fit">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-              <span>Disponível para novos projetos</span>
-            </div>
-
+          <a href="#contato" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-zinc-400 hover:text-zinc-100">
+            05. contato
+          </a>
+          <div className="pt-2 flex flex-col gap-2">
+            <button
+              onClick={copyEmail}
+              className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300"
+            >
+              {copied ? "E-mail copiado!" : "Copiar e-mail profissional"}
+            </button>
             <a
-              href="https://wa.me/5551999065232?text=Ol%C3%A1%20Vitor%2C%20vi%20seu%20site%20e%20gostaria%20de%20conversar%20sobre%20um%20projeto%2Foportunidade."
+              href="https://wa.me/5551999065232?text=Ol%C3%A1%20Vitor%2C%20vi%20seu%20site%20e%20gostaria%20de%20conversar."
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-md"
+              className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-md bg-zinc-100 text-zinc-950 font-bold"
             >
-              <MessageSquare className="w-4 h-4" />
-              Conversar no WhatsApp
+              Falar no WhatsApp
             </a>
           </div>
         </div>

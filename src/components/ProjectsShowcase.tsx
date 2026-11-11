@@ -1,195 +1,312 @@
-import React from "react";
-import { Layers, Bot, Server, Database, CheckCircle2, ShieldAlert, LucideIcon } from "lucide-react";
+"use client";
 
-interface ProjectCase {
+import { useState } from "react";
+import { Check } from "lucide-react";
+
+interface CaseStudy {
+  id: string;
   tag: string;
-  tagColor: string;
   title: string;
-  subtitle: string;
-  description: string;
-  icon: LucideIcon;
-  problem: string;
-  solution: string;
-  metrics: string[];
-  techStack: string[];
+  role: string;
+  period: string;
+  context: string;
+  challenge: string;
+  technicalSolution: string;
+  architectureCode: string;
+  impacts: string[];
+  stack: string[];
 }
 
-const cases: ProjectCase[] = [
+const caseStudies: CaseStudy[] = [
   {
-    tag: "E-Commerce & SaaS Hub",
-    tagColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    title: "Ecossistema HypedTCG: Faturamento SaaS & Concorrência de Estoque",
-    subtitle: "Plataforma web de alta escala com controle transacional e faturamento automatizado",
-    description:
-      "Desenvolvimento de ponta a ponta do ecossistema que integra marketplace, leilões em tempo real, painel de parceiros e sistema de cobrança recorrente com 7 dias de trial.",
-    icon: Layers,
-    problem:
-      "Vendas simultâneas geravam riscos de concorrência e divergência de saldo em itens de alto valor, além da necessidade de split de comissões para parceiros e cobrança via Pix e Cartão.",
-    solution:
-      "Criação de esteira transacional no Laravel com reserva temporizada de 10 minutos para carrinhos e devolução atômica ao estoque em caso de abandono. Integração completa com Asaas e Mercado Pago com tratamento idempotente de webhooks.",
-    metrics: [
-      "Zero divergência de inventário através de travas de concorrência no MySQL",
-      "Cobrança recorrente automatizada com Pix dinâmico e cartão até 12x",
-      "SEO técnico avançado com Schema.org / JSON-LD e sitemaps dinâmicos",
+    id: "hypedtcg-concurrency",
+    tag: "Transacional & Concorrência",
+    title: "Reserva de Estoque Temporizada (10 min) & Cobrança SaaS",
+    role: "Arquiteto de Backend & Full Stack",
+    period: "HypedTCG / Games Hyped",
+    context:
+      "Plataforma de comércio eletrônico de itens colecionáveis e ecossistema SaaS de leilões, com alto pico de requisições simultâneas durante lançamentos de produtos exclusivos.",
+    challenge:
+      "Em horários de pico, múltiplos usuários tentavam comprar as mesmas cartas unitárias. Havia risco severo de race conditions (vender o mesmo item 2 vezes) ou de estoque travado por carrinhos abandonados, além da necessidade de split de faturamento recorrente com o gateway Asaas e Mercado Pago.",
+    technicalSolution:
+      "Implementação de esteira transacional no Laravel utilizando bloqueio de linha em banco (ACID). Ao entrar no checkout, os itens são reservados com marcação temporal de expiração de exatamente 10 minutos. Uma rotina assíncrona programada varre faturas pendentes e devolve o saldo de forma atômica para a tabela principal de estoque em caso de desistência, sem qualquer intervenção humana.",
+    architectureCode: `// Arquitetura Transacional de Concorrência
+DB::transaction(function () use ($cart, $user) {
+    // 1. Lock pessimista para garantir leitura única
+    $item = StockItem::where('id', $cart->item_id)
+        ->lockForUpdate()
+        ->firstOrFail();
+
+    if ($item->available_qty < $cart->qty) {
+        throw new OutOfStockException("Item indisponível no momento.");
+    }
+
+    // 2. Criação do lote com expiração de 10 min
+    $batch = AdvanceSale::create([
+        'user_id'    => $user->id,
+        'expires_at' => now()->addMinutes(10),
+        'status'     => 'pending_payment'
+    ]);
+
+    // 3. Baixa temporária no saldo do estoque
+    $item->decrement('available_qty', $cart->qty);
+});`,
+    impacts: [
+      "Zero inconsistência ou venda duplicada após o deploy em produção",
+      "Liberação automática e atômica de centenas de lotes diários abandonados",
+      "Integração de checkout com Pix dinâmico e cartão até 12x via Asaas",
     ],
-    techStack: ["Laravel 11", "Next.js 14", "MySQL", "Asaas API", "Mercado Pago", "Tailwind CSS"],
+    stack: ["Laravel 11", "Next.js 14", "MySQL InnoDB", "Asaas API", "Mercado Pago"],
   },
   {
-    tag: "Automação & Real-time",
-    tagColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    title: "Bots de WhatsApp de Alta Concorrência (POKE-MAN & SaaS Bot)",
-    subtitle: "Automação de lances, votos e vendas rodando 24/7 com tolerância a missclicks",
-    description:
-      "Solução corporativa de mensageria em Node.js integrada diretamente ao banco de dados e APIs do Laravel para conduzir leilões e interações automáticas em centenas de grupos.",
-    icon: Bot,
-    problem:
-      "Erros operacionais de usuários enviando lances acidentais (missclicks) sem mecanismo de tolerância, somados a quedas de processos por instabilidade de rede.",
-    solution:
-      "Implementação de regra de tolerância de 10 minutos para retificação de votos com timestamp ISO 8601 no backend e daemons resilientes gerenciados via PM2 com reinicialização automática e consumo controlado de memória.",
-    metrics: [
-      "Operação contínua 24/7 sem vazamento de memória sob PM2",
-      "Persistência atômica de lances e votos em tempo real no banco",
-      "Redução drástica de disputas de clientes através da regra de missclick",
+    id: "whatsapp-bot-realtime",
+    tag: "Tempo Real & Mensageria",
+    title: "Bot de Leilões em WhatsApp com Tolerância a Missclicks",
+    role: "Engenharia de Automação & Real-time",
+    period: "POKE-MAN / SaaS Bot",
+    context:
+      "Robô corporativo em Node.js conectado a centenas de grupos de WhatsApp, responsável por conduzir leilões e coletar lances de compradores em tempo real.",
+    challenge:
+      "Usuários frequentemente digitavam lances errados por engano (missclick) e disputas operacionais sobrecarregavam o time humano. Além disso, quedas de conexão ou reinicializações do servidor não podiam corromper o estado do leilão em andamento.",
+    technicalSolution:
+      "Arquitetura de processamento assíncrono conectando o client de mensageria à API REST do Laravel. Foi criada uma regra de tolerância temporal de 10 minutos onde um usuário pode retificar seu voto/lance anterior; a API substitui atomicamente o registro anterior recalculando o ranking da rodada. A aplicação roda sob o daemon PM2 em VPS Linux com auto-restart e persistência em MySQL.",
+    architectureCode: `// Lógica de Missclick e Tolerância Temporal
+public function replaceVotes(Request $request) {
+    $previousVote = Vote::where('group_id', $request->group_id)
+        ->where('user_phone', $request->user_phone)
+        ->latest('voted_at')
+        ->first();
+
+    // Tolerância estrita de 10 minutos
+    if ($previousVote && $previousVote->voted_at->diffInMinutes(now()) <= 10) {
+        $previousVote->update(['is_cancelled' => true, 'reason' => 'missclick']);
+    }
+
+    return Vote::create([
+        'group_id'   => $request->group_id,
+        'user_phone' => $request->user_phone,
+        'bid_value'  => $request->bid_value,
+        'voted_at'   => now()->toISOString()
+    ]);
+}`,
+    impacts: [
+      "Uptime contínuo 24/7 sob PM2 sem vazamentos de memória",
+      "Eliminação quase total de disputas de lances acidentais",
+      "Persistência em tempo real com tolerância a timezones via ISO 8601",
     ],
-    techStack: ["Node.js", "Laravel API", "MySQL", "PM2", "WebSockets", "Docker"],
+    stack: ["Node.js", "Laravel REST API", "PM2 Daemon", "MySQL", "WebSockets"],
   },
   {
+    id: "webops-nginx-r2",
     tag: "Infraestrutura & WebOps",
-    tagColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    title: "WebOps: Sustentação de VPS Linux, Nginx & Armazenamento R2",
-    subtitle: "Resolução de gargalos de rede, proxy reverso e otimização de banda de servidores",
-    description:
-      "Administração completa da infraestrutura de servidores VPS Ubuntu responsáveis por hospedar múltiplos domínios, APIs, frontends e bancos de dados.",
-    icon: Server,
-    problem:
-      "Consumo excessivo de banda por imagens pesadas na VPS e vazamento de cabeçalhos de proxy no Nginx (HEADER_X_FORWARDED_HOST) causando erros 404 em assets e falhas em rate limiting por IP de clientes reais.",
-    solution:
-      "Ajuste cirúrgico das políticas de TrustProxies e Nginx Virtual Hosts, aliado à migração de assets estáticos para armazenamento em nuvem no Cloudflare R2 (S3-compatible) com proteção de borda (WAF e SSL).",
-    metrics: [
-      "Resolução definitiva de erros 404 em rotas e rewrites do Next.js",
-      "Economia massiva de tráfego de rede e latência nos servidores VPS",
-      "SSL/TLS automatizado com renovação Certbot e proteção Cloudflare",
+    title: "Resolução de Headers no Nginx & Offload de Banda com Cloudflare R2",
+    role: "Sysadmin & WebOps",
+    period: "Games Hyped / Produção",
+    context:
+      "Ambiente de produção hospedado em servidor VPS Ubuntu contendo múltiplos domínios, proxies reversos em Nginx, aplicações Next.js e APIs Laravel compartilhando o mesmo host.",
+    challenge:
+      "O tráfego de imagens de alta resolução de milhares de cartas consumia banda excessiva da VPS. Além disso, a aplicação sofria com erros 404 em assets estáticos devido ao vazamento do cabeçalho X-Forwarded-Host entre o frontend Next.js e o backend Laravel.",
+    technicalSolution:
+      "Diagnóstico fino de tráfego HTTP com ajuste cirúrgico da política de TrustProxies no Laravel e reconfiguração dos Virtual Hosts do Nginx. Paralelamente, implementou-se um pipeline de upload e entrega de mídias direto no Cloudflare R2 (Object Storage compatível com AWS S3) protegido por regras de cache de borda (CDN).",
+    architectureCode: `// Nginx Reverse Proxy com Isolamento de Headers
+server {
+    server_name panel.hypedtcg.com.br;
+    
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Offload de mídia pesada direto para Cloudflare R2
+    location /media/ {
+        proxy_pass https://pub-r2-storage.vitoraguirre.com.br/;
+        proxy_cache_valid 200 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+    }
+}`,
+    impacts: [
+      "Eliminação imediata de falhas 404 em rotas dinâmicas e imagens",
+      "Redução drástica no consumo de CPU e largura de banda do servidor VPS",
+      "Latência de entrega de imagens reduzida para milissegundos via CDN",
     ],
-    techStack: ["Ubuntu VPS", "Nginx", "Cloudflare R2 / S3", "Certbot SSL", "Bash / Crontab"],
+    stack: ["Ubuntu Server", "Nginx", "Cloudflare R2 (S3 API)", "Certbot SSL", "Docker"],
   },
   {
-    tag: "Dados & Inteligência",
-    tagColor: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    title: "Inteligência de Mercado & Rotinas de Sincronização em Python/SQL",
-    subtitle: "Pipelines de extração (scraping), saneamento e reconciliação de estoques",
-    description:
-      "Construção de rotinas em Python (Selenium e Pandas) e serviços em Laravel para monitoramento de concorrentes, consolidação de KPIs e precificação dinâmica de mercado.",
-    icon: Database,
-    problem:
-      "Atualização manual inviável de cotações de milhares de itens de catálogo e necessidade de relatórios analíticos de Growth para tomadas de decisão comerciais.",
-    solution:
-      "Desenvolvimento de scripts de web scraping com saneamento de dados em Pandas e serviço assíncrono StockMarketValueSyncService no Laravel, além de dashboards no Zoho Analytics via queries SQL complexas.",
-    metrics: [
-      "Sincronização diária automatizada de milhares de cotações de mercado",
-      "Dashboards gerenciais em tempo real alimentados por consultas SQL otimizadas",
-      "Automação de prospecção comercial reduzindo horas de esforço manual",
+    id: "scraping-bi-sync",
+    tag: "ETL & Inteligência Comercial",
+    title: "Pipelines de Scraping em Python & Sincronização Diária de Mercado",
+    role: "Engenharia de Dados & Automação",
+    period: "Messem Investimentos & Games Hyped",
+    context:
+      "Necessidade de monitoramento contínuo de concorrência, precificação dinâmica de estoque e consolidação de métricas de crescimento (Growth) para tomadas de decisão.",
+    challenge:
+      "Tabelas de preços e prospecção eram mantidas manualmente, gerando defasagem nos valores de venda e perda de oportunidades de negócio.",
+    technicalSolution:
+      "Construção de robôs em Python (Selenium e Pandas) para extração automatizada de cotações de mercado e higienização dos dados. No backend, desenvolveu-se o serviço assíncrono StockMarketValueSyncService que executa via crontab/scheduler diário, aplicando as variações diretamente nos registros do MySQL.",
+    architectureCode: `// Serviço de Sincronização em Lote no Laravel
+public function syncMarketPrices(Collection $stockCards): int {
+    $updatedCount = 0;
+    
+    foreach ($stockCards->chunk(200) as $batch) {
+        $ids = $batch->pluck('external_id');
+        $marketData = $this->externalPriceFeed->fetchBatch($ids);
+
+        DB::transaction(function () use ($batch, $marketData, &$updatedCount) {
+            foreach ($batch as $card) {
+                if (isset($marketData[$card->external_id])) {
+                    $card->update(['market_value' => $marketData[$card->external_id]]);
+                    $updatedCount++;
+                }
+            }
+        });
+    }
+    return $updatedCount;
+}`,
+    impacts: [
+      "Atualização diária automatizada de milhares de itens de catálogo",
+      "Dashboards no Zoho Analytics e MySQL com KPIs em tempo real",
+      "Economia de dezenas de horas semanais de trabalho manual de precificação",
     ],
-    techStack: ["Python", "Pandas", "Selenium", "MySQL Avançado", "Zoho Analytics", "SQL"],
+    stack: ["Python", "Pandas", "Selenium", "Laravel Service", "MySQL", "Zoho Analytics"],
   },
 ];
 
 export default function ProjectsShowcase() {
+  const [activeTab, setActiveTab] = useState(caseStudies[0].id);
+  const currentCase = caseStudies.find((c) => c.id === activeTab) || caseStudies[0];
+
   return (
-    <section id="cases" className="py-20 md:py-28 relative border-t border-slate-800/80 bg-[#090d16]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="cases" className="py-20 md:py-28 border-b border-zinc-800/80">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-semibold uppercase tracking-wider">
-            Engenharia Aplicada
+        <div className="mb-12 space-y-2">
+          <div className="text-xs font-mono text-blue-400 uppercase tracking-wider">
+            {"// 02. engenharia & produção"}
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Cases Reais em Produção
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            Casos de Engenharia e Problemas Resolvidos
           </h2>
-          <p className="text-slate-400 text-base sm:text-lg">
-            Projetos que resolvem dores reais de negócio: integridade financeira, concorrência,
-            automação e estabilidade de infraestrutura.
+          <p className="text-zinc-400 text-sm max-w-2xl">
+            Sistemas reais que operam sob regras de negócio críticas. Clique nos casos abaixo para ver o desafio,
+            a arquitetura adotada e a implementação técnica:
           </p>
         </div>
 
-        {/* Case Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {cases.map((project, idx) => {
-            const Icon = project.icon;
-            return (
-              <div
-                key={idx}
-                className="rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-slate-800 p-6 sm:p-8 flex flex-col justify-between hover:border-slate-700 transition-all duration-300 shadow-xl group"
-              >
-                <div>
-                  {/* Top Bar with Tag and Icon */}
-                  <div className="flex items-center justify-between gap-4 mb-4">
-                    <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${project.tagColor}`}>
-                      {project.tag}
-                    </span>
-                    <div className="w-10 h-10 rounded-xl bg-slate-800/80 flex items-center justify-center text-slate-300 group-hover:text-blue-400 group-hover:bg-blue-500/10 transition-colors">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                  </div>
+        {/* Tab Navigation */}
+        <div className="flex flex-wrap gap-2 mb-8 border-b border-zinc-800 pb-4">
+          {caseStudies.map((c, idx) => (
+            <button
+              key={c.id}
+              onClick={() => setActiveTab(c.id)}
+              className={`px-3 py-1.5 rounded-md text-xs font-mono transition-all ${
+                activeTab === c.id
+                  ? "bg-zinc-100 text-zinc-950 font-bold shadow-sm"
+                  : "bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 border border-zinc-800"
+              }`}
+            >
+              0{idx + 1}. {c.tag}
+            </button>
+          ))}
+        </div>
 
-                  {/* Title & Description */}
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-snug">
-                    {project.title}
-                  </h3>
-                  <p className="text-sm font-medium text-slate-400 mb-4">
-                    {project.subtitle}
-                  </p>
-                  <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                    {project.description}
-                  </p>
+        {/* Detailed Case View */}
+        <div className="rounded-lg bg-zinc-950 border border-zinc-800 overflow-hidden shadow-2xl">
+          
+          {/* Case Header */}
+          <div className="p-6 sm:p-8 border-b border-zinc-800/80 bg-zinc-900/30">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-3 text-xs font-mono">
+              <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                {currentCase.tag}
+              </span>
+              <span className="text-zinc-400">
+                {currentCase.role} • {currentCase.period}
+              </span>
+            </div>
 
-                  {/* Problem & Solution Accordion-style layout */}
-                  <div className="space-y-3 mb-6 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 text-xs">
-                    <div>
-                      <div className="font-semibold text-rose-400 flex items-center gap-1.5 mb-1">
-                        <ShieldAlert className="w-3.5 h-3.5" />
-                        O Desafio Técnico:
-                      </div>
-                      <div className="text-slate-300 leading-normal">{project.problem}</div>
-                    </div>
-                    <div className="pt-2 border-t border-slate-800/60">
-                      <div className="font-semibold text-emerald-400 flex items-center gap-1.5 mb-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        A Solução Implementada:
-                      </div>
-                      <div className="text-slate-300 leading-normal">{project.solution}</div>
-                    </div>
-                  </div>
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+              {currentCase.title}
+            </h3>
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-3xl">
+              {currentCase.context}
+            </p>
+          </div>
 
-                  {/* Key Highlights */}
-                  <div className="space-y-2 mb-6">
-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                      Resultados & Destaques:
-                    </div>
-                    {project.metrics.map((m, mIdx) => (
-                      <div key={mIdx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-200">
-                        <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                        <span>{m}</span>
-                      </div>
-                    ))}
-                  </div>
+          {/* Case Content Grid: Challenge & Solution */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-zinc-800/80">
+            
+            {/* Left: Problem & Solution text */}
+            <div className="lg:col-span-6 p-6 sm:p-8 space-y-6">
+              <div>
+                <h4 className="text-xs font-mono text-rose-400 uppercase tracking-wider mb-2">
+                  {"// O Desafio de Negócio & Técnico"}
+                </h4>
+                <p className="text-zinc-300 text-sm leading-relaxed">
+                  {currentCase.challenge}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-mono text-emerald-400 uppercase tracking-wider mb-2">
+                  {"// A Solução Implementada"}
+                </h4>
+                <p className="text-zinc-300 text-sm leading-relaxed">
+                  {currentCase.technicalSolution}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">
+                  {"// Resultados & Impactos"}
+                </h4>
+                <ul className="space-y-2 text-xs sm:text-sm text-zinc-300">
+                  {currentCase.impacts.map((imp, iIdx) => (
+                    <li key={iIdx} className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <span>{imp}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="pt-2">
+                <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-2">
+                  Tecnologias Utilizadas:
                 </div>
-
-                {/* Tech Badges */}
-                <div className="pt-4 border-t border-slate-800/80 flex flex-wrap gap-1.5">
-                  {project.techStack.map((tech, tIdx) => (
-                    <span
-                      key={tIdx}
-                      className="text-xs font-medium px-2.5 py-1 rounded-md bg-slate-800/70 text-slate-300 border border-slate-700/50"
-                    >
-                      {tech}
+                <div className="flex flex-wrap gap-1.5 font-mono text-xs">
+                  {currentCase.stack.map((st, sIdx) => (
+                    <span key={sIdx} className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">
+                      {st}
                     </span>
                   ))}
                 </div>
-
               </div>
-            );
-          })}
+            </div>
+
+            {/* Right: Architecture & Code Snippet */}
+            <div className="lg:col-span-6 p-6 sm:p-8 bg-[#070709] flex flex-col justify-between font-mono">
+              <div>
+                <div className="flex items-center justify-between text-xs text-zinc-500 pb-3 mb-4 border-b border-zinc-800/80">
+                  <span>snippet_arquitetura.php</span>
+                  <span className="text-[11px] text-zinc-600">{"// trecho demonstrativo real"}</span>
+                </div>
+
+                <pre className="text-xs text-zinc-300 overflow-x-auto leading-relaxed p-3 bg-zinc-950 rounded border border-zinc-900">
+                  <code>{currentCase.architectureCode}</code>
+                </pre>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-zinc-900 text-xs text-zinc-500 flex items-center justify-between">
+                <span>ambiente: produção</span>
+                <span className="text-zinc-400">código limpo & testado</span>
+              </div>
+            </div>
+
+          </div>
+
         </div>
 
       </div>

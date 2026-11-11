@@ -1,68 +1,67 @@
 export default function TechStack() {
   const categories = [
     {
-      name: "Backend & APIs",
-      skills: ["PHP 8+", "Laravel 10/11", "Node.js", "Express", "RESTful APIs", "Microservices", "Webhooks"],
+      label: "Backend & Arquitetura",
+      items: ["PHP 8.3+", "Laravel 11 (Eloquent, Migrations, Jobs)", "Node.js", "Express", "RESTful APIs", "Webhooks Idempotentes"],
     },
     {
-      name: "Frontend & UI",
-      skills: ["Next.js (App Router)", "React", "Vue.js", "Nuxt.js", "TypeScript", "JavaScript (ES6+)", "Tailwind CSS"],
+      label: "Frontend & UI",
+      items: ["Next.js 14/15 (App Router, Server Actions)", "React 18/19", "Vue.js 3", "Nuxt.js", "TypeScript", "Tailwind CSS"],
     },
     {
-      name: "Banco de Dados & Transações",
-      skills: ["MySQL", "Modelagem Relacional", "ACID", "Controle de Concorrência", "Índices B-Tree", "EXPLAIN / Otimização"],
+      label: "Bancos de Dados & Transações",
+      items: ["MySQL", "Modelagem Relacional", "Controle de Concorrência (Lock)", "Índices B-Tree", "Transações ACID", "EXPLAIN / Tuning"],
     },
     {
-      name: "Infraestrutura & WebOps",
-      skills: ["Linux (Ubuntu)", "Nginx Reverse Proxy", "Cloudflare (DNS & WAF)", "Cloudflare R2 (S3)", "Docker", "PM2 Daemons", "SSL / Certbot"],
+      label: "Infraestrutura & WebOps",
+      items: ["Linux (Ubuntu Server)", "Nginx Reverse Proxy", "Cloudflare (DNS, WAF, SSL)", "Cloudflare R2 (S3 API)", "Docker", "PM2 Daemons"],
     },
     {
-      name: "Pagamentos & Cobrança",
-      skills: ["Stripe Checkout", "Asaas (Pix & Cartão)", "Mercado Pago", "PayPal", "Assinaturas SaaS", "Split de Comissões"],
+      label: "Integrações de Pagamento",
+      items: ["Stripe Checkout", "Asaas (Pix Dinâmico & Cartão)", "Mercado Pago", "PayPal", "PagSeguro", "Assinaturas SaaS com Trial"],
     },
     {
-      name: "Automação & Dados",
-      skills: ["Python", "Selenium Scraping", "Pandas", "Zoho CRM / Analytics", "RPA de Processos", "WhatsApp Web API"],
+      label: "Automação & Dados",
+      items: ["Python", "Selenium Web Scraping", "Pandas", "Zoho Analytics / CRM", "RPA de Processos", "WhatsApp Web Protocol"],
     },
   ];
 
   return (
-    <section id="stack" className="py-20 md:py-28 bg-[#090d16] relative border-t border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="stack" className="py-20 md:py-28 border-b border-zinc-800/80">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-xs font-semibold uppercase tracking-wider">
-            Competências Técnicas
+        <div className="mb-12 space-y-2">
+          <div className="text-xs font-mono text-blue-400 uppercase tracking-wider">
+            {"// 04. tecnologias & ferramentas"}
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Stack Tecnológica & Ferramentas
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            Ferramentas Consolidadas em Produção
           </h2>
-          <p className="text-slate-400 text-base sm:text-lg">
-            Tecnologias consolidadas em produção para entregar software robusto, estável e escalável.
+          <p className="text-zinc-400 text-sm max-w-2xl">
+            Sem modismos ou tecnologias de tutorial: ferramentas que utilizo no dia a dia para sustentar
+            sistemas reais e estáveis.
           </p>
         </div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {categories.map((cat, idx) => (
             <div
               key={idx}
-              className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-slate-700 transition-all duration-200"
+              className="p-5 rounded-lg bg-zinc-950 border border-zinc-800/90 font-mono text-xs"
             >
-              <h3 className="text-base font-bold text-white mb-4 pb-2 border-b border-slate-800 flex items-center justify-between">
-                <span>{cat.name}</span>
-                <span className="text-xs text-slate-500 font-mono">0{idx + 1}</span>
-              </h3>
+              <div className="text-zinc-400 font-bold mb-3 pb-2 border-b border-zinc-900 flex justify-between">
+                <span>{cat.label}</span>
+                <span className="text-zinc-600">[{idx + 1}]</span>
+              </div>
 
-              <div className="flex flex-wrap gap-2">
-                {cat.skills.map((skill, sIdx) => (
-                  <span
-                    key={sIdx}
-                    className="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-700/80 transition-colors border border-slate-700/40"
-                  >
-                    {skill}
-                  </span>
+              <div className="space-y-1.5">
+                {cat.items.map((item, iIdx) => (
+                  <div key={iIdx} className="text-zinc-300 flex items-center gap-2">
+                    <span className="text-zinc-600">›</span>
+                    <span>{item}</span>
+                  </div>
                 ))}
               </div>
             </div>

@@ -21,7 +21,7 @@ export default function Footer() {
 
           <div className="flex items-center gap-3">
             <a
-              href="https://github.com/vitoraguirre"
+              href="https://github.com/kyzer94"
               target="_blank"
               rel="noopener noreferrer"
               className="text-zinc-400 hover:text-white transition-colors"

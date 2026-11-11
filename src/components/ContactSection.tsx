@@ -90,7 +90,7 @@ Mensagem: ${details || "Gostaria de conversar sobre um projeto/oportunidade."}`;
                   <span>linkedin</span>
                 </a>
                 <a
-                  href="https://github.com/vitoraguirre"
+                  href="https://github.com/kyzer94"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-zinc-700 flex items-center justify-center gap-2 text-zinc-300 hover:text-white transition-colors"
